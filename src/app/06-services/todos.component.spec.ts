@@ -1,6 +1,6 @@
 import { TodosComponent } from './todos.component';
 import { TodoService } from './todo.service';
-import { from, empty, throwError } from '../../../node_modules/rxjs';
+import { from, empty, throwError, Subscription } from '../../../node_modules/rxjs';
 
 describe('TodosComponent', () => {
   let component: TodosComponent;
@@ -18,6 +18,7 @@ describe('TodosComponent', () => {
     component.ngOnInit();
     expect(component.todos).toBe(todos);
   });
+  // testing add method
   it('should call the server to save the changes when a new todo item is added', () => {
     let spy = spyOn(service, 'add').and.callFake(t => {
       return empty();
@@ -38,5 +39,20 @@ describe('TodosComponent', () => {
 
     component.add();
     expect(component.message).toBe(error);
+  });
+  // testing delete method
+  it('should call the server to delete a todo item if the user confirms', () => {
+
+    spyOn(window, 'confirm').and.returnValue(true);   // window.confirm();
+    let spy = spyOn(service, 'delete').and.returnValue(empty());
+    component.delete(1);
+    expect(spy).toHaveBeenCalledWith(1);
+  });
+  it('should NOT call the server to delete a todo item if the user cancels', () => {
+
+    spyOn(window, 'confirm').and.returnValue(false);   // window.confirm();
+    let spy = spyOn(service, 'delete').and.returnValue(empty());
+    component.delete(1);
+    expect(spy).not.toHaveBeenCalled();
   });
 });
